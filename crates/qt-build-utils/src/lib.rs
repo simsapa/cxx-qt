@@ -1094,6 +1094,11 @@ Q_IMPORT_PLUGIN({plugin_class_name});
                 output_path.to_str().unwrap(),
                 "--name",
                 &name,
+                "--no-zstd",
+                "--format-version",
+                "1",
+                "--compress-algo",
+                "zlib",
             ])
             .output()
             .unwrap_or_else(|_| panic!("rcc failed for {}", input_path.display()));
