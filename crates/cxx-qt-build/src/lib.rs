@@ -36,10 +36,12 @@ use qt_build_utils::SemVer;
 use quote::ToTokens;
 use std::{
     collections::HashSet,
+    fs,
     env,
     fs::File,
     io::Write,
     path::{Path, PathBuf},
+    process::Command,
 };
 
 use cxx_qt_gen::{
@@ -1182,4 +1184,40 @@ extern "C" bool {init_fun}() {{
             vec![public_initializer.strip_file()],
         );
     }
+}
+
+/// Whether iOS is the current target
+pub fn is_ios_target() -> bool {
+    env::var("TARGET")
+        .map(|target| target.contains("apple-ios"))
+        .unwrap_or_else(|_| false)
+}
+
+/// Run the `lipo` tool to thin generated fat libs, and replace (overwrite) the
+/// fat lib file with the thinned lib. For example for iOS (arm64):
+///
+/// thin_generated_fat_library_with_lipo("libcxx-qt-cxxqt-generated.a", "arm64");
+pub fn thin_generated_fat_library_with_lipo(lib_file_name: &str, arch: &str) {
+    // Get the output directory where Cargo places build artifacts.
+    let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR not set"));
+
+    // Define paths for the original fat library and the generated thin library.
+    let fat_lib = out_dir.join(lib_file_name);
+    let thin_lib = out_dir.join(format!("{}-thin.a", lib_file_name.replace(".a", "")));
+
+    // Run the lipo command to thin the library for arm64 (aarch64).
+    let status = Command::new("lipo")
+        .args(&["-thin", arch, "-output"])
+        .arg(&thin_lib)
+        .arg(&fat_lib)
+        .status()
+        .expect("failed to execute lipo");
+
+    if !status.success() {
+        panic!("lipo thinning failed");
+    }
+
+    // Replace the old fat library with the new thin library by renaming it.
+    fs::rename(&thin_lib, &fat_lib)
+        .expect("failed to replace fat library with thin library");
 }

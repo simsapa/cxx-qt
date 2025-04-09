@@ -4,7 +4,9 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use cxx_qt_build::CxxQtBuilder;
+use cxx_qt_build::{is_ios_target, thin_generated_fat_library_with_lipo};
 use std::path::PathBuf;
+
 fn qt_gui_enabled() -> bool {
     std::env::var("CARGO_FEATURE_QT_GUI").is_ok()
 }
@@ -388,4 +390,8 @@ fn main() {
         println!("cargo::rerun-if-changed=src/qt_types.cpp");
     });
     builder.build();
+
+    if is_ios_target() {
+        thin_generated_fat_library_with_lipo("libcxx-qt-lib-cxxqt-generated.a", "arm64");
+    }
 }

@@ -6,6 +6,7 @@
 use std::path::PathBuf;
 
 use cxx_qt_build::{CxxQtBuilder, Interface};
+use cxx_qt_build::{is_ios_target, thin_generated_fat_library_with_lipo};
 
 fn header_dir() -> PathBuf {
     PathBuf::from(std::env::var("OUT_DIR").unwrap())
@@ -59,4 +60,8 @@ fn main() {
     });
 
     builder.build();
+
+    if is_ios_target() {
+        thin_generated_fat_library_with_lipo("libcxx-qt-cxxqt-generated.a", "arm64");
+    }
 }
