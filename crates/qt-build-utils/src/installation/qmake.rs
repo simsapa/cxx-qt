@@ -193,7 +193,8 @@ impl QtInstallation for QtInstallationQMake {
 
             // Ensure that any framework paths are set to -F
             for framework_path in self.qmake_framework_paths() {
-                builder.flag_if_supported(format!("-F{}", framework_path.display()));
+                // NOTE: builder.flag_if_supported() doesn't work when building for iOS.
+                builder.flag(format!("-F{}", framework_path.display()));
                 // Also set the -rpath otherwise frameworks can not be found at runtime
                 println!(
                     "cargo::rustc-link-arg=-Wl,-rpath,{}",

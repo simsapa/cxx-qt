@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use cxx_qt_build::CxxQtBuilder;
+use cxx_qt_build::{is_ios_target, thin_generated_fat_library_with_lipo};
 
 fn main() {
     let mut builder = CxxQtBuilder::new().crate_include_root(Some("include".to_owned()));
@@ -27,4 +28,8 @@ fn main() {
     });
 
     builder.build().export();
+
+    if is_ios_target() {
+        thin_generated_fat_library_with_lipo("libcxx-qt-cxxqt-generated.a", "arm64");
+    }
 }
