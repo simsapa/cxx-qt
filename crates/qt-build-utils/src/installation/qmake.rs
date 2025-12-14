@@ -223,7 +223,7 @@ impl QtInstallation for QtInstallationQMake {
             let (link_lib, prl_path) = if framework {
                 (
                     format!("framework=Qt{qt_module}"),
-                    format!("{lib_path}/Qt{qt_module}.framework/Resources/Qt{qt_module}.prl"),
+                    format!("{lib_path}/Qt{qt_module}.framework/Versions/A/Resources/Qt{qt_module}.prl"),
                 )
             } else {
                 (

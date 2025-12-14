@@ -63,9 +63,13 @@ fn extract_lib_from_filename<'a>(target: &str, filename: &'a str) -> Option<&'a 
         }
     } else if target.contains("apple") {
         if let Some(filename) = filename.strip_prefix(prefix) {
-            test_suffixes(filename, &[".a", ".so", ".dylib"])
+            if let Some(s) = test_suffixes(filename, &[".a", ".so", ".dylib"]) {
+                Some(s)
+            } else {
+                Some(filename)
+            }
         } else {
-            None
+            Some(filename)
         }
     } else {
         if let Some(filename) = filename.strip_prefix(prefix) {
