@@ -10,6 +10,13 @@ pub(crate) fn is_apple_target() -> bool {
         .unwrap_or_else(|_| false)
 }
 
+/// Whether iOS is the current target
+pub fn is_ios_target() -> bool {
+    std::env::var("TARGET")
+        .map(|target| target.contains("apple-ios"))
+        .unwrap_or_else(|_| false)
+}
+
 /// Whether emscripten is the current target
 pub(crate) fn is_emscripten_target() -> bool {
     std::env::var("CARGO_CFG_TARGET_OS") == Ok("emscripten".to_owned())
